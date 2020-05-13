@@ -1,0 +1,6 @@
+venv/
+idea/
+__pycache__/
+*.py[cod]
+rozetka_items_crape/spiders/text.txt
+rozetka_items_crape/spiders/items.json
