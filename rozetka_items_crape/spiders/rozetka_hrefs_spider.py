@@ -33,12 +33,11 @@ class HrefsSpider(scrapy.Spider):
             for category in categories:
                 href_to_new_catalog = category['link']
                 yield scrapy.Request(href_to_new_catalog, meta={'category_item': category},
-                                     callback=self.parse_count_of_pase_for_category)
+                                     callback=self.parse_count_of_page_for_category)
 
-    def parse_count_of_pase_for_category(self, response):
+    def parse_count_of_page_for_category(self, response):
         item = response.meta['category_item']
         count_pages = int(response.css("ul.paginator-catalog li span::text").getall()[-1])
-        item['count_of_pages'] = count_pages
         page = 0
         links = []
 
@@ -55,11 +54,15 @@ class HrefsSpider(scrapy.Spider):
             yield scrapy.Request(href_to_new_catalog_page, self.parse_items_on_new_page)
 
     def parse_items_on_new_page(self, response):
-
+        promo_date = response.css("rz-promopage-promocode span::text").get().strip().split(" ")[-1]
         for item in response.css("div.g-i-tile-catalog"):
 
             name = item.css('a.novisited::text').get().strip().split("(")[0]
             href_to_file = item.css('a.novisited::attr(href)').get()
+            link_to_photo = item.css('g-i-tile-i-image img::attr(src)').get()
+            old_price = int(item.css('g-price-old-uah::text').get())
+            cheaper_price = int(item.css('g-price-uah::text').get())
+            sale_promo_date = promo_date
 
             if name != "" and href_to_file != "#":
                 file.write(name + " " + href_to_file + "\n")
@@ -67,5 +70,9 @@ class HrefsSpider(scrapy.Spider):
             iProduct = ProductItem()
             iProduct['name'] = name
             iProduct['link'] = href_to_file
-
+            iProduct['link_to_photo'] = link_to_photo
+            iProduct['old_price'] = old_price
+            iProduct['cheaper_price'] = cheaper_price
+            iProduct['sale'] = (cheaper_price * 100)/old_price
+            iProduct['sale_promo_date'] = sale_promo_date
             yield iProduct

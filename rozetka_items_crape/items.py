@@ -6,20 +6,18 @@
 # https://docs.scrapy.org/en/latest/topics/items.html
 
 import scrapy
+from scrapy_djangoitem import DjangoItem
+
+from rozetka_items_crape.mysite.rozetka.models import Category, Product
 
 
 class RozetkaItemsCrapeItem(scrapy.Item):
-    # define the fields for your item here like:
-    # name = scrapy.Field()
     pass
 
 
-class CategoryItem(scrapy.Item):
-    name = scrapy.Field()
-    link = scrapy.Field()
-    count_of_pages = scrapy.Field()
+class CategoryItem(DjangoItem):
+    django_model = Category
 
 
-class ProductItem(scrapy.Item):
-    name = scrapy.Field()
-    link = scrapy.Field()
+class ProductItem(DjangoItem):
+    django_model = Product
